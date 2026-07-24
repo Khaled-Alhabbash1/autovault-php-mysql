@@ -25,4 +25,20 @@ document.addEventListener('DOMContentLoaded', function () {
             navToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
         });
     }
+
+    // ---------------------------------------------------------------------
+    // Small helper for the login/register forms: stop the submit button from
+    // being clicked twice (which could create two accounts on a slow
+    // connection). The real validation still happens on the server.
+    // ---------------------------------------------------------------------
+    var authForms = document.querySelectorAll('.auth-form');
+    authForms.forEach(function (form) {
+        form.addEventListener('submit', function () {
+            var submitButton = form.querySelector('button[type="submit"]');
+            if (submitButton) {
+                submitButton.disabled = true;
+                submitButton.textContent = 'Please wait...';
+            }
+        });
+    });
 });

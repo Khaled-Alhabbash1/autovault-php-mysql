@@ -290,3 +290,482 @@ h1, h2, h3 {
         text-align: left;
     }
 }
+
+/* =========================================================================
+   Authentication pages (login and register forms)
+   ========================================================================= */
+
+/* Centred, narrow card for the auth forms */
+.auth-page {
+    max-width: 26rem;
+    margin: 0 auto;
+}
+.auth-page h1 {
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.auth-form {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    padding: 1.5rem;
+}
+
+/* Each label + input pair */
+.form-group {
+    margin-bottom: 1rem;
+}
+.form-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.35rem;
+}
+.form-group input {
+    width: 100%;
+    padding: 0.6rem 0.7rem;
+    font-size: 1rem;
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    background: #fff;
+}
+.form-group input:focus {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 1px;
+    border-color: var(--color-primary);
+}
+
+/* The auth form's submit button should fill the width */
+.auth-form .button {
+    width: 100%;
+    border: none;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+/* Link under the form ("Already have an account?") */
+.auth-alt {
+    text-align: center;
+    margin-top: 1rem;
+    color: var(--color-muted);
+}
+
+/* Validation error box */
+.form-errors {
+    background: #fff0f0;
+    border: 1px solid #e0b4b4;
+    color: #a12622;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1rem;
+}
+.form-errors ul {
+    margin: 0;
+    padding-left: 1.1rem;
+}
+
+/* Success message box (e.g. after registering) */
+.form-success {
+    background: #eaf7ec;
+    border: 1px solid #a9d5b2;
+    color: #1c6b2c;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1rem;
+}
+
+/* =========================================================================
+   Navigation: logged-in welcome text and Logout button
+   ========================================================================= */
+
+/* The "Hi, Name" greeting in the navigation bar */
+.nav-welcome {
+    color: #9ecbff;
+    padding: 0.6rem 0.25rem;
+    font-weight: 600;
+}
+
+/* The logout form sits inline with the other nav items */
+.logout-form {
+    margin: 0;
+}
+
+/* Make the Logout button look like the other text nav links */
+.nav-logout {
+    background: none;
+    border: none;
+    color: #fff;
+    font: inherit;
+    cursor: pointer;
+    padding: 0.6rem 0.25rem;
+}
+.nav-logout:hover,
+.nav-logout:focus {
+    text-decoration: underline;
+}
+
+/* =========================================================================
+   Catalogue: search form, results grid, cards and pagination
+   ========================================================================= */
+
+.catalogue h1 {
+    margin-bottom: 1rem;
+}
+
+/* ---- Search / filter form ---- */
+.filter-form {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    padding: 1.25rem;
+    margin-bottom: 1.5rem;
+}
+
+/* One column on phones; the media queries below add more columns. */
+.filter-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+}
+
+/* The keyword box spans the full width of the grid when possible. */
+.filter-keyword {
+    grid-column: 1 / -1;
+}
+
+.filter-form label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.3rem;
+}
+.filter-form input,
+.filter-form select {
+    width: 100%;
+    padding: 0.55rem 0.6rem;
+    font-size: 1rem;
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    background: #fff;
+}
+.filter-form input:focus,
+.filter-form select:focus {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 1px;
+    border-color: var(--color-primary);
+}
+
+.filter-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 1rem;
+}
+.filter-form .button {
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+}
+/* A quieter style for the "Clear filters" link */
+.button-secondary {
+    background: #6c757d;
+}
+.button-secondary:hover,
+.button-secondary:focus {
+    background: #565e64;
+}
+
+/* ---- Result count ---- */
+.catalogue-count {
+    color: var(--color-muted);
+    margin-bottom: 1rem;
+}
+
+/* ---- Empty state ---- */
+.no-results {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    padding: 2rem 1.5rem;
+    text-align: center;
+}
+
+/* ---- Vehicle grid ---- */
+.vehicle-grid {
+    list-style: none;
+    display: grid;
+    grid-template-columns: 1fr;   /* one card per row on phones */
+    gap: 1.25rem;
+    padding: 0;
+    margin: 0;
+}
+
+/* ---- Vehicle card ---- */
+.vehicle-card {
+    background: #fff;
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    overflow: hidden;
+    transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+.vehicle-card:hover {
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
+}
+.vehicle-card__link {
+    display: block;
+    color: inherit;
+    text-decoration: none;
+}
+.vehicle-card__link:hover,
+.vehicle-card__link:focus {
+    text-decoration: none;
+}
+
+/* Image and placeholder share the same box shape */
+.vehicle-card__img,
+.vehicle-card__placeholder {
+    display: block;
+    width: 100%;
+    height: 180px;
+    object-fit: cover;      /* photos fill the box without stretching */
+    background: var(--color-surface);
+}
+.vehicle-card__placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-muted);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.vehicle-card__body {
+    padding: 1rem;
+}
+.vehicle-card__title {
+    font-size: 1.1rem;
+    margin-bottom: 0.35rem;
+}
+.vehicle-card__price {
+    color: var(--color-primary);
+    font-weight: 700;
+    font-size: 1.15rem;
+    margin-bottom: 0.5rem;
+}
+.vehicle-card__meta {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem 0.75rem;
+    padding: 0;
+    margin: 0 0 0.5rem;
+    color: var(--color-muted);
+    font-size: 0.9rem;
+}
+.vehicle-card__meta li {
+    position: relative;
+}
+/* Small dot separators between meta items */
+.vehicle-card__meta li + li::before {
+    content: "•";
+    margin-right: 0.75rem;
+    color: var(--color-border);
+}
+.vehicle-card__status {
+    font-size: 0.85rem;
+    color: var(--color-muted);
+}
+
+/* ---- Pagination ---- */
+.pagination {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    justify-content: center;
+    margin-top: 2rem;
+}
+.pagination__link {
+    display: inline-block;
+    padding: 0.5rem 0.8rem;
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    background: #fff;
+    color: var(--color-primary);
+    text-decoration: none;
+}
+.pagination__link:hover,
+.pagination__link:focus {
+    background: var(--color-surface);
+    text-decoration: none;
+}
+.pagination__link--current {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    color: #fff;
+    font-weight: 700;
+}
+
+/* ---- Catalogue responsive columns ---- */
+@media (min-width: 600px) {
+    .filter-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .vehicle-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+@media (min-width: 900px) {
+    .filter-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+    .vehicle-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* =========================================================================
+   Vehicle details page
+   ========================================================================= */
+
+.vehicle-details__back {
+    display: inline-block;
+    margin-bottom: 1.25rem;
+    font-weight: 600;
+}
+
+.vehicle-details__header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.vehicle-details__eyebrow {
+    color: #1c6b2c;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.25rem;
+    text-transform: uppercase;
+}
+
+.vehicle-details__price {
+    color: var(--color-primary);
+    font-size: 1.8rem;
+    font-weight: 700;
+}
+
+.vehicle-details__layout {
+    display: grid;
+    gap: 1.5rem;
+}
+
+.vehicle-gallery__primary,
+.vehicle-gallery__placeholder {
+    display: block;
+    width: 100%;
+    min-height: 18rem;
+    max-height: 34rem;
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    background: var(--color-surface);
+    object-fit: cover;
+}
+
+.vehicle-gallery__placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-muted);
+}
+
+.vehicle-gallery__list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+    list-style: none;
+    margin-top: 0.75rem;
+    padding: 0;
+}
+
+.vehicle-gallery__list img {
+    display: block;
+    width: 100%;
+    height: 8rem;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    object-fit: cover;
+}
+
+.vehicle-details__content {
+    display: grid;
+    gap: 1.25rem;
+}
+
+.vehicle-specs,
+.vehicle-description,
+.vehicle-actions,
+.vehicle-message {
+    background: #fff;
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    padding: 1.25rem;
+}
+
+.vehicle-specs h2,
+.vehicle-description h2,
+.vehicle-actions h2,
+.vehicle-message h1 {
+    margin-bottom: 0.9rem;
+}
+
+.vehicle-specs__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+.vehicle-specs__grid dt {
+    color: var(--color-muted);
+    font-size: 0.85rem;
+    margin-bottom: 0.15rem;
+}
+
+.vehicle-specs__grid dd {
+    font-weight: 600;
+    margin: 0;
+}
+
+.vehicle-description p {
+    white-space: normal;
+}
+
+.vehicle-actions {
+    background: var(--color-surface);
+}
+
+.vehicle-actions .button,
+.vehicle-message .button {
+    margin-top: 1rem;
+}
+
+.vehicle-message {
+    max-width: 40rem;
+    margin: 2rem auto;
+    text-align: center;
+}
+
+@media (min-width: 700px) {
+    .vehicle-gallery__list {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media (min-width: 950px) {
+    .vehicle-details__layout {
+        grid-template-columns: minmax(0, 1.35fr) minmax(20rem, 0.8fr);
+        align-items: start;
+    }
+}

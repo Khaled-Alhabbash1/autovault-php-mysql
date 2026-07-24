@@ -14,6 +14,10 @@
  * -------------------------------------------------------------------------
  */
 
+// Load the session/auth helper. This safely starts the session (in one
+// reusable place) so the navigation below can show login-aware links.
+require_once __DIR__ . '/auth.php';
+
 // The name of the site, shown in the logo and titles.
 $siteName = 'AutoVault';
 
@@ -69,11 +73,28 @@ function navActive($file, $currentPage) {
             <!-- Main navigation. On mobile it is hidden until the button opens it. -->
             <nav class="main-nav" id="mainNav" aria-label="Main navigation">
                 <ul class="nav-menu">
+                    <!-- These public links are always shown. -->
                     <li><a class="nav-link<?php echo navActive('index.php', $currentPage); ?>" href="index.php">Home</a></li>
                     <li><a class="nav-link<?php echo navActive('catalogue.php', $currentPage); ?>" href="catalogue.php">Catalogue</a></li>
                     <li><a class="nav-link<?php echo navActive('about.php', $currentPage); ?>" href="about.php">About</a></li>
-                    <li><a class="nav-link<?php echo navActive('login.php', $currentPage); ?>" href="login.php">Login</a></li>
-                    <li><a class="nav-link<?php echo navActive('register.php', $currentPage); ?>" href="register.php">Register</a></li>
+
+                    <?php if (is_logged_in()): ?>
+                        <!-- Logged-in visitors: a welcome message and a Logout button.
+                             The name is escaped with e() to keep output safe. -->
+                        <li class="nav-welcome">Hi, <?php echo e(current_user()['name']); ?></li>
+                        <li>
+                            <!-- Logout is a POST form carrying a CSRF token, so it
+                                 cannot be triggered by another website. -->
+                            <form action="logout.php" method="post" class="logout-form">
+                                <?php echo csrf_field(); ?>
+                                <button type="submit" class="nav-link nav-logout">Logout</button>
+                            </form>
+                        </li>
+                    <?php else: ?>
+                        <!-- Logged-out visitors: Login and Register. -->
+                        <li><a class="nav-link<?php echo navActive('login.php', $currentPage); ?>" href="login.php">Login</a></li>
+                        <li><a class="nav-link<?php echo navActive('register.php', $currentPage); ?>" href="register.php">Register</a></li>
+                    <?php endif; ?>
                 </ul>
             </nav>
 
