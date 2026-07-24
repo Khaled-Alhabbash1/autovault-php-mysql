@@ -1,0 +1,292 @@
+/* =========================================================================
+   AutoVault - Main stylesheet
+   -------------------------------------------------------------------------
+   Written without any CSS framework. It is "mobile first": the base styles
+   are for small screens, and the @media block near the bottom adds the
+   desktop layout for wider screens.
+   ========================================================================= */
+
+/* ---- Simple reset so spacing looks the same across browsers ---- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box; /* padding/borders count inside an element's width */
+}
+
+/* ---- Colour and font variables (change these to re-skin the site) ---- */
+:root {
+    --color-primary: #1f6feb;
+    --color-dark: #0d1117;
+    --color-text: #24292f;
+    --color-muted: #57606a;
+    --color-bg: #ffffff;
+    --color-surface: #f6f8fa;
+    --color-border: #d0d7de;
+    --max-width: 1100px;
+}
+
+/* ---- Base page styles ---- */
+body {
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    line-height: 1.6;
+    color: var(--color-text);
+    background: var(--color-bg);
+}
+
+/* Centres content and adds side padding on small screens */
+.container {
+    width: 100%;
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+a {
+    color: var(--color-primary);
+    text-decoration: none;
+}
+a:hover,
+a:focus {
+    text-decoration: underline;
+}
+
+h1, h2, h3 {
+    line-height: 1.25;
+    margin-bottom: 0.5rem;
+}
+
+/* =========================================================================
+   Header and responsive navigation
+   ========================================================================= */
+.site-header {
+    background: var(--color-dark);
+    color: #fff;
+    position: sticky;   /* keeps the header visible while scrolling */
+    top: 0;
+    z-index: 100;
+}
+
+.header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 60px;
+    flex-wrap: wrap;
+}
+
+.logo {
+    color: #fff;
+    font-size: 1.35rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+.logo:hover {
+    text-decoration: none;
+}
+
+/* The hamburger button - only visible on small screens */
+.nav-toggle {
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    width: 42px;
+    height: 42px;
+    padding: 8px;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 6px;
+    cursor: pointer;
+}
+.nav-toggle-bar {
+    display: block;
+    height: 2px;
+    width: 100%;
+    background: #fff;
+}
+
+/* On mobile the menu is hidden until the button adds the "is-open" class */
+.main-nav {
+    flex-basis: 100%;
+    display: none;
+}
+.main-nav.is-open {
+    display: block;
+}
+
+.nav-menu {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    padding: 0.5rem 0;
+}
+
+.nav-link {
+    display: block;
+    color: #fff;
+    padding: 0.6rem 0.25rem;
+}
+.nav-link:hover,
+.nav-link:focus {
+    text-decoration: underline;
+}
+/* Highlights the link for the page you are currently on */
+.nav-link.active {
+    font-weight: 700;
+    color: #9ecbff;
+}
+
+/* =========================================================================
+   Main content sections
+   ========================================================================= */
+.main-content {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+    min-height: 60vh; /* keeps the footer down on short pages */
+}
+
+/* Hero banner on the home page */
+.hero {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    padding: 2rem 1.5rem;
+    text-align: center;
+    margin-bottom: 2rem;
+}
+.hero h1 {
+    font-size: 1.8rem;
+}
+.hero p {
+    color: var(--color-muted);
+    max-width: 40rem;
+    margin: 0.75rem auto;
+}
+
+/* Reusable button */
+.button {
+    display: inline-block;
+    background: var(--color-primary);
+    color: #fff;
+    padding: 0.7rem 1.4rem;
+    border-radius: 6px;
+    font-weight: 600;
+    margin-top: 0.5rem;
+}
+.button:hover,
+.button:focus {
+    background: #1a5fce;
+    text-decoration: none;
+}
+
+/* Feature cards on the home page (stacked on mobile) */
+.features {
+    margin-bottom: 2rem;
+}
+.features h2 {
+    text-align: center;
+    margin-bottom: 1rem;
+}
+.feature-grid {
+    display: grid;
+    grid-template-columns: 1fr; /* one column on mobile */
+    gap: 1rem;
+}
+.feature-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    padding: 1.25rem;
+}
+.feature-card h3 {
+    color: var(--color-primary);
+}
+
+/* About page spacing */
+.page-intro,
+.about-details {
+    margin-bottom: 1.5rem;
+    max-width: 55rem;
+}
+.about-details h2 {
+    margin-top: 1.25rem;
+}
+.about-details ul {
+    padding-left: 1.25rem;
+}
+.note {
+    color: var(--color-muted);
+    font-style: italic;
+}
+
+/* =========================================================================
+   Footer
+   ========================================================================= */
+.site-footer {
+    background: var(--color-dark);
+    color: #fff;
+    padding: 1.5rem 0;
+    margin-top: 2rem;
+}
+.footer-inner {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    text-align: center;
+}
+.footer-brand {
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+.footer-links {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+}
+.footer-links a {
+    color: #9ecbff;
+}
+.copyright {
+    color: #c9d1d9;
+    font-size: 0.9rem;
+}
+
+/* =========================================================================
+   Desktop layout: applied on screens 768px wide and up
+   ========================================================================= */
+@media (min-width: 768px) {
+
+    /* Hide the hamburger button on larger screens */
+    .nav-toggle {
+        display: none;
+    }
+
+    /* Always show the menu; lay the links out in a row */
+    .main-nav {
+        display: block;
+        flex-basis: auto;
+    }
+    .nav-menu {
+        flex-direction: row;
+        gap: 1.25rem;
+        padding: 0;
+    }
+
+    .hero h1 {
+        font-size: 2.4rem;
+    }
+
+    /* Three feature cards side by side */
+    .feature-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    /* Spread the footer content across the width */
+    .footer-inner {
+        flex-direction: row;
+        justify-content: space-between;
+        text-align: left;
+    }
+}

@@ -1,0 +1,20 @@
+# --- Secrets: never commit credentials, keys or local config ---
+.env
+config.local.php
+config/config.php
+includes/config.php
+
+# --- Dependencies ---
+/vendor/
+
+# --- Logs ---
+*.log
+
+# --- Editors / IDEs ---
+.vscode/
+.idea/
+
+# --- OS files ---
+.DS_Store
+Thumbs.db
+desktop.ini
