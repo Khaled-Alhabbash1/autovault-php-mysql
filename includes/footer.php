@@ -27,6 +27,9 @@ $currentYear = date('Y');
                     <li><a href="catalogue.php">Catalogue</a></li>
                     <li><a href="media.php">Media</a></li>
                     <li><a href="help.php">Help</a></li>
+                    <li><a href="privacy.php">Privacy</a></li>
+                    <li><a href="accessibility.php">Accessibility</a></li>
+                    <li><a href="sitemap.php">Sitemap</a></li>
                 </ul>
             </nav>
             <p class="copyright">

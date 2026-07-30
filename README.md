@@ -27,8 +27,8 @@ See [docs/FEATURES.md](docs/FEATURES.md) for the complete feature list.
 ## Pages
 
 - **Public:** Home, About (with interactive map), Catalogue, Vehicle details,
-  Media, and the Help landing page.
-- **Authenticated user:** Profile (with test-drive request history),
+  Media, Help landing page, Sitemap, Privacy, and Accessibility.
+- **Authenticated user:** Profile, My test-drive requests (full history),
   Favourites, Test-drive request, Login, Register, Logout.
 - **Administrator:** Dashboard, Vehicle list, Create vehicle, Edit vehicle,
   Deactivate vehicle, User administration, Test-drive request list, Request

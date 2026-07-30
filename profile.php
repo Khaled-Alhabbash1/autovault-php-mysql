@@ -179,43 +179,15 @@ require __DIR__ . '/includes/header.php';
                         <a href="catalogue.php">Browse the catalogue</a> to get started.
                     </p>
                 <?php else: ?>
-                    <div class="admin-table-wrap">
-                        <table class="admin-table">
-                            <caption class="visually-hidden">Your test-drive requests</caption>
-                            <thead>
-                                <tr>
-                                    <th scope="col">Vehicle</th>
-                                    <th scope="col">Preferred date</th>
-                                    <th scope="col">Preferred time</th>
-                                    <th scope="col">Status</th>
-                                    <th scope="col">Submitted</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach ($requests as $request): ?>
-                                    <tr>
-                                        <td>
-                                            <?php if ($request['vehicle_id'] !== null): ?>
-                                                <a href="vehicle.php?id=<?php echo (int) $request['vehicle_id']; ?>">
-                                                    <?php echo e($request['year'] . ' ' . $request['make'] . ' ' . $request['model']); ?>
-                                                </a>
-                                            <?php else: ?>
-                                                Vehicle no longer listed
-                                            <?php endif; ?>
-                                        </td>
-                                        <td><?php echo e($request['preferred_date'] ?? '-'); ?></td>
-                                        <td><?php echo e($request['preferred_time'] ?? '-'); ?></td>
-                                        <td>
-                                            <span class="status-badge status-badge--<?php echo e($request['status']); ?>">
-                                                <?php echo e(ucfirst($request['status'])); ?>
-                                            </span>
-                                        </td>
-                                        <td><?php echo e($request['created_at']); ?></td>
-                                    </tr>
-                                <?php endforeach; ?>
-                            </tbody>
-                        </table>
-                    </div>
+                    <p>
+                        You have <?php echo count($requests); ?>
+                        test-drive request<?php echo count($requests) === 1 ? '' : 's'; ?> on record.
+                    </p>
+                    <p>
+                        <a class="button button-secondary" href="my-requests.php">
+                            View your test-drive requests
+                        </a>
+                    </p>
                 <?php endif; ?>
             </section>
 

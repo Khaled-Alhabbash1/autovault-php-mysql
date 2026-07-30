@@ -51,6 +51,7 @@ $contextHelpPages = [
     'register.php' => 'help-account.php',
     'favourites.php' => 'help-favourites.php',
     'testdrive.php' => 'help-testdrive.php',
+    'my-requests.php' => 'help-testdrive.php',
     'profile.php' => 'help-account.php',
     'media.php' => 'help-media.php',
 ];
