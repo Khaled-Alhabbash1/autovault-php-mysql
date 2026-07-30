@@ -51,6 +51,7 @@ $contextHelpPages = [
     'register.php' => 'help-account.php',
     'favourites.php' => 'help-favourites.php',
     'testdrive.php' => 'help-testdrive.php',
+    'profile.php' => 'help-account.php',
     'media.php' => 'help-media.php',
 ];
 if ($inAdminArea) {
@@ -145,6 +146,7 @@ function navActive($file, $currentPage) {
                     <?php if (is_logged_in()): ?>
                         <!-- Logged-in visitors: a welcome message and a Logout button.
                              The name is escaped with e() to keep output safe. -->
+                        <li><a class="nav-link<?php echo navActive('profile.php', $currentPage); ?>" href="profile.php">Profile</a></li>
                         <li><a class="nav-link<?php echo navActive('favourites.php', $currentPage); ?>" href="favourites.php">Favourites</a></li>
                         <?php if (is_admin()): ?>
                             <li><a class="nav-link<?php echo $inAdminArea ? ' active' : ''; ?>" href="admin/index.php">Admin</a></li>

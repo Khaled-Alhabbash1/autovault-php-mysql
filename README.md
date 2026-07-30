@@ -12,6 +12,9 @@ records, accounts, requests, and safe application health information.
 - Registration, login, logout, sessions, and active-account checks
 - Private favourites and authenticated test-drive requests
 - Administrator dashboard and vehicle, user, and request management
+- Private user profile with editable name and test-drive request history
+- Interactive location map (OpenStreetMap) on the About page
+- Accessible "vehicles by body type" data visualization on the monitoring page
 - Read-only administrator monitoring
 - Three persistent site-wide themes: light, dark, and showroom
 - Public media page using three student-supplied MP4 videos
@@ -20,6 +23,18 @@ records, accounts, requests, and safe application health information.
 - Accessible shared layout, keyboard focus styles, and reduced-motion support
 
 See [docs/FEATURES.md](docs/FEATURES.md) for the complete feature list.
+
+## Pages
+
+- **Public:** Home, About (with interactive map), Catalogue, Vehicle details,
+  Media, and the Help landing page.
+- **Authenticated user:** Profile (with test-drive request history),
+  Favourites, Test-drive request, Login, Register, Logout.
+- **Administrator:** Dashboard, Vehicle list, Create vehicle, Edit vehicle,
+  Deactivate vehicle, User administration, Test-drive request list, Request
+  details, Request status update, and Monitoring (with data visualization).
+- **Help/Wiki:** seven topic pages (overview, catalogue, accounts, favourites,
+  test drives, media, administration).
 
 ## Technology stack
 
@@ -109,10 +124,11 @@ student-supplied photographs and should be reviewed before real-world use.
 ## Themes
 
 The external stylesheet defines visibly distinct light, dark, and showroom
-themes with CSS custom properties. The external JavaScript cycles through a
-strict whitelist, saves the choice in `localStorage`, safely rejects invalid
-values, and follows operating-system preference only before a choice is saved.
-The site navigation remains usable without JavaScript.
+themes with CSS custom properties. The external JavaScript presents three
+labelled theme buttons (Light, Dark, Showroom) from a strict whitelist, marks
+the active one with `aria-pressed`, saves the choice in `localStorage`, safely
+rejects invalid values, and follows the operating-system preference only before
+a choice is saved. The site navigation remains usable without JavaScript.
 
 ## Help/Wiki
 

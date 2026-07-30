@@ -19,6 +19,8 @@ $latestDates = [
     'Latest vehicle created' => null,
     'Latest request created' => null,
 ];
+// Aggregate data for the accessible "vehicles by body type" chart.
+$vehiclesByBodyType = [];
 $localConfigExists = file_exists(__DIR__ . '/../includes/config.php');
 $exampleConfigExists = file_exists(__DIR__ . '/../includes/config.example.php');
 
@@ -79,6 +81,18 @@ if ($localConfigExists) {
             $latest = $latestStmt->fetchColumn();
             $latestDates[$label] = is_string($latest) && $latest !== '' ? $latest : null;
         }
+
+        // Safe aggregate counts only (no personal data) for the chart below.
+        // Empty/NULL body types are grouped under "Unspecified".
+        $bodyVizStmt = $monitoringPdo->prepare(
+            "SELECT COALESCE(NULLIF(TRIM(body_type), ''), 'Unspecified') AS label,
+                    COUNT(*) AS total
+             FROM vehicles
+             GROUP BY label
+             ORDER BY total DESC, label ASC"
+        );
+        $bodyVizStmt->execute();
+        $vehiclesByBodyType = $bodyVizStmt->fetchAll();
     } catch (Throwable $e) {
         error_log('Administrator monitoring database check failed: ' . $e->getMessage());
     }
@@ -161,6 +175,54 @@ require __DIR__ . '/../includes/header.php';
                     </div>
                 <?php endforeach; ?>
             </dl>
+        </section>
+
+        <section aria-labelledby="viz-heading" class="viz-section">
+            <h2 id="viz-heading">Vehicles by body type</h2>
+            <p>A simple visual breakdown of the catalogue using safe aggregate counts.
+               The table is the accessible text alternative to the bars.</p>
+
+            <?php if (empty($vehiclesByBodyType)): ?>
+                <p class="note">No vehicle data is available to chart yet.</p>
+            <?php else: ?>
+                <?php
+                    // Largest group sets the scale for every bar.
+                    $vizMax = 0;
+                    foreach ($vehiclesByBodyType as $vizRow) {
+                        $vizMax = max($vizMax, (int) $vizRow['total']);
+                    }
+                    $vizMax = max($vizMax, 1);
+                ?>
+                <div class="admin-table-wrap">
+                    <table class="admin-table viz-table">
+                        <caption class="visually-hidden">Number of vehicles grouped by body type</caption>
+                        <thead>
+                            <tr>
+                                <th scope="col">Body type</th>
+                                <th scope="col">Vehicles</th>
+                                <th scope="col">Relative amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($vehiclesByBodyType as $vizRow): ?>
+                                <?php $vizCount = (int) $vizRow['total']; ?>
+                                <tr>
+                                    <th scope="row"><?php echo e($vizRow['label']); ?></th>
+                                    <td><?php echo $vizCount; ?></td>
+                                    <td>
+                                        <!-- <meter> shows the bar without any inline CSS
+                                             and is announced to assistive technology. -->
+                                        <meter class="viz-meter" min="0"
+                                               max="<?php echo (int) $vizMax; ?>"
+                                               value="<?php echo $vizCount; ?>"
+                                               aria-label="<?php echo e($vizRow['label'] . ': ' . $vizCount . ' vehicles'); ?>"><?php echo $vizCount; ?></meter>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            <?php endif; ?>
         </section>
     </section>
 
