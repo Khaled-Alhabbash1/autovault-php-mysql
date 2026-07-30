@@ -138,7 +138,9 @@ function catalogue_page_url(array $filters, $sortKey, $pageNumber) {
         $query['sort'] = $sortKey;
     }
     $query['page'] = $pageNumber;
-    return 'catalogue.php?' . http_build_query($query);
+    // The #catalogue-results fragment makes the browser jump straight to the
+    // car list after the page reloads, instead of back to the top of the page.
+    return 'catalogue.php?' . http_build_query($query) . '#catalogue-results';
 }
 
 // ---- Display the page ----
@@ -285,7 +287,7 @@ require __DIR__ . '/includes/header.php';
         </form>
 
         <?php if (!$dbError): ?>
-            <p class="catalogue-count">
+            <p class="catalogue-count" id="catalogue-results" tabindex="-1">
                 <?php echo (int) $total; ?>
                 vehicle<?php echo ($total === 1) ? '' : 's'; ?> found
             </p>

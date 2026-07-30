@@ -10,6 +10,9 @@ includes/config.php
 # --- Logs ---
 *.log
 
+# --- Runtime session files (never commit these) ---
+storage/
+
 # --- Editors / IDEs ---
 .vscode/
 .idea/

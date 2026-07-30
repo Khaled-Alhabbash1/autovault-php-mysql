@@ -21,6 +21,21 @@
 // -------------------------------------------------------------------------
 if (session_status() === PHP_SESSION_NONE) {
 
+    // Make sure PHP has a writable folder for session files. Some XAMPP setups
+    // block the default C:\xampp\tmp folder ("Permission denied"), which would
+    // stop logins and CSRF tokens from working. We use a project-local folder
+    // (storage/sessions), and fall back to the system temp folder if needed.
+    $projectSessionDir = dirname(__DIR__) . '/storage/sessions';
+    if (!is_dir($projectSessionDir)) {
+        // The @ hides a warning if it already exists in a race; we re-check below.
+        @mkdir($projectSessionDir, 0777, true);
+    }
+    if (is_dir($projectSessionDir) && is_writable($projectSessionDir)) {
+        session_save_path($projectSessionDir);
+    } elseif (is_writable(sys_get_temp_dir())) {
+        session_save_path(sys_get_temp_dir());
+    }
+
     // Secure cookie settings where the environment supports them.
     $cookieParams = [
         'lifetime' => 0,      // session cookie: cleared when the browser closes
