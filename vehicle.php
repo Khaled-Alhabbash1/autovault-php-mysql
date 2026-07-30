@@ -2,30 +2,27 @@
 /**
  * AutoVault - Public vehicle details page
  *
- * Displays one available vehicle and its images. This milestone is read-only:
- * it does not add favourites, test-drive requests, or any other write action.
+ * Displays one available vehicle and its images. Logged-in users can save or
+ * remove it through the CSRF-protected POST handler in favourites.php.
  */
 
+require_once __DIR__ . '/includes/auth.php';
 require_once __DIR__ . '/includes/vehicle-functions.php';
+require_once __DIR__ . '/includes/favourite-functions.php';
 
 $vehicle = null;
 $images = [];
+$options = [];
 $pageError = null;
-$vehicleId = null;
+$isFavourite = false;
+$favouriteFlash = take_favourite_flash();
 
 // Accept only a positive, base-10 integer that fits the schema's UNSIGNED INT.
-$rawId = $_GET['id'] ?? null;
-if (
-    !is_string($rawId)
-    || !preg_match('/^[1-9][0-9]*$/', $rawId)
-    || strlen($rawId) > 10
-    || (int) $rawId > 4294967295
-) {
+$vehicleId = parse_vehicle_id($_GET['id'] ?? null);
+if ($vehicleId === null) {
     http_response_code(400);
     $pageError = 'invalid';
 } else {
-    $vehicleId = (int) $rawId;
-
     try {
         require_once __DIR__ . '/includes/db.php';
 
@@ -66,6 +63,30 @@ if (
                     $images[] = $image;
                 }
             }
+
+            $optionStmt = $pdo->prepare(
+                "SELECT id, option_group, option_name, price_adjustment, is_default
+                 FROM vehicle_options
+                 WHERE vehicle_id = :vehicle_id
+                 ORDER BY sort_order ASC, id ASC"
+            );
+            $optionStmt->execute([':vehicle_id' => $vehicleId]);
+            $options = $optionStmt->fetchAll();
+
+            // Favourite ownership is always checked with the session user ID.
+            if (is_logged_in()) {
+                $favouriteStmt = $pdo->prepare(
+                    "SELECT 1
+                     FROM favourites
+                     WHERE user_id = :user_id AND vehicle_id = :vehicle_id
+                     LIMIT 1"
+                );
+                $favouriteStmt->execute([
+                    ':user_id' => (int) current_user()['id'],
+                    ':vehicle_id' => $vehicleId,
+                ]);
+                $isFavourite = (bool) $favouriteStmt->fetchColumn();
+            }
         }
     } catch (PDOException $e) {
         error_log('Vehicle details query failed: ' . $e->getMessage());
@@ -73,6 +94,7 @@ if (
         $pageError = 'database';
         $vehicle = null;
         $images = [];
+        $options = [];
     }
 }
 
@@ -89,6 +111,14 @@ require __DIR__ . '/includes/header.php';
 
     <section class="vehicle-details">
         <a class="vehicle-details__back" href="catalogue.php">&larr; Back to catalogue</a>
+        <span class="context-help"><a href="help-catalogue.php">Vehicle details help</a></span>
+
+        <?php if ($favouriteFlash !== null): ?>
+            <div class="<?php echo $favouriteFlash['type'] === 'error' ? 'form-errors' : 'form-success'; ?>"
+                 role="<?php echo $favouriteFlash['type'] === 'error' ? 'alert' : 'status'; ?>">
+                <?php echo e($favouriteFlash['message']); ?>
+            </div>
+        <?php endif; ?>
 
         <?php if ($pageError !== null): ?>
             <div class="vehicle-message" role="alert">
@@ -130,12 +160,13 @@ require __DIR__ . '/includes/header.php';
                         ?>
                         <img class="vehicle-gallery__primary"
                              src="<?php echo e($primaryImage['safe_src']); ?>"
-                             alt="<?php echo e($primaryAlt); ?>">
+                             alt="<?php echo e($primaryAlt); ?>"
+                             width="1200" height="800">
                     <?php else: ?>
-                        <div class="vehicle-gallery__placeholder" role="img"
-                             aria-label="<?php echo e('No image available for ' . $defaultAlt); ?>">
-                            No image available
-                        </div>
+                        <img class="vehicle-gallery__primary"
+                             src="assets/images/vehicles/vehicle-placeholder.svg"
+                             alt="<?php echo e('No photograph available for ' . $defaultAlt); ?>"
+                             width="1200" height="800">
                     <?php endif; ?>
 
                     <?php if ($additionalImages): ?>
@@ -150,6 +181,7 @@ require __DIR__ . '/includes/header.php';
                                 <li>
                                     <img src="<?php echo e($image['safe_src']); ?>"
                                          alt="<?php echo e($imageAlt); ?>"
+                                         width="640" height="360"
                                          loading="lazy">
                                 </li>
                             <?php endforeach; ?>
@@ -213,10 +245,75 @@ require __DIR__ . '/includes/header.php';
                         <?php endif; ?>
                     </section>
 
+                    <?php if ($options): ?>
+                        <section class="vehicle-options" aria-labelledby="options-heading">
+                            <h2 id="options-heading">Available options</h2>
+                            <p id="options-help">
+                                Choose extras to preview an estimated configured price.
+                                Your selections are not submitted or reserved.
+                            </p>
+                            <fieldset class="vehicle-options__fieldset" aria-describedby="options-help">
+                                <legend class="visually-hidden">Vehicle extras</legend>
+                                <?php foreach ($options as $option): ?>
+                                    <?php
+                                        $adjustment = (float) $option['price_adjustment'];
+                                        $adjustmentLabel = ($adjustment >= 0 ? '+' : '-')
+                                            . format_price(abs($adjustment));
+                                    ?>
+                                    <label class="vehicle-option">
+                                        <input type="checkbox"
+                                               class="vehicle-option__control"
+                                               data-price-adjustment="<?php echo e(number_format($adjustment, 2, '.', '')); ?>"
+                                               <?php echo (int) $option['is_default'] === 1 ? 'checked' : ''; ?>>
+                                        <span>
+                                            <strong><?php echo e($option['option_name']); ?></strong>
+                                            <small>
+                                                <?php echo e($option['option_group']); ?>
+                                                (<?php echo e($adjustmentLabel); ?>)
+                                            </small>
+                                        </span>
+                                    </label>
+                                <?php endforeach; ?>
+                            </fieldset>
+                            <p class="vehicle-options__total">
+                                Estimated configured price:
+                                <output id="configuredPrice"
+                                        data-base-price="<?php echo e(number_format((float) $vehicle['price'], 2, '.', '')); ?>">
+                                    <?php echo e(format_price($vehicle['price'])); ?>
+                                </output>
+                            </p>
+                        </section>
+                    <?php endif; ?>
+
                     <aside class="vehicle-actions" aria-label="Vehicle actions">
                         <h2>Interested in this vehicle?</h2>
-                        <p>Favourites and test-drive booking will be available in a later milestone.</p>
-                        <a class="button" href="catalogue.php">Continue browsing</a>
+                        <?php if (is_logged_in()): ?>
+                            <form action="favourites.php" method="post">
+                                <?php echo csrf_field(); ?>
+                                <input type="hidden" name="action"
+                                       value="<?php echo $isFavourite ? 'remove' : 'add'; ?>">
+                                <input type="hidden" name="vehicle_id"
+                                       value="<?php echo (int) $vehicleId; ?>">
+                                <input type="hidden" name="return_to" value="vehicle">
+                                <button class="button<?php echo $isFavourite ? ' button-danger' : ''; ?>"
+                                        type="submit">
+                                    <?php echo $isFavourite ? 'Remove from favourites' : 'Add to favourites'; ?>
+                                </button>
+                            </form>
+                            <p><a href="favourites.php">View all favourites</a></p>
+                            <p>
+                                <a class="button" href="testdrive.php?vehicle_id=<?php echo (int) $vehicleId; ?>">
+                                    Request a test drive
+                                </a>
+                            </p>
+                        <?php else: ?>
+                            <p>
+                                <a href="login.php">Log in</a> to add this vehicle to your favourites.
+                            </p>
+                            <p>
+                                <a href="login.php">Log in</a> to request a test drive.
+                            </p>
+                        <?php endif; ?>
                     </aside>
                 </div>
             </div>

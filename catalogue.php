@@ -133,11 +133,13 @@ function catalogue_page_url(array $filters, $sortKey, $pageNumber) {
 // ---- Display the page ----
 $pageTitle       = 'Catalogue';
 $metaDescription = 'Browse available vehicles at AutoVault. Search and filter by make, price, year and more.';
+$metaKeywords = 'vehicle catalogue, car search, vehicle filters, AutoVault';
 require __DIR__ . '/includes/header.php';
 ?>
 
     <section class="catalogue">
         <h1>Vehicle Catalogue</h1>
+        <p class="context-help"><a href="help-catalogue.php">How to search and compare vehicles</a></p>
 
         <?php if ($dbError): ?>
             <!-- Shown only if a database error happened (details are logged, not shown). -->
@@ -291,11 +293,14 @@ require __DIR__ . '/includes/header.php';
                                     <img class="vehicle-card__img"
                                          src="<?php echo e($imageSrc); ?>"
                                          alt="<?php echo e($altText); ?>"
+                                         width="640" height="360"
                                          loading="lazy">
                                 <?php else: ?>
-                                    <span class="vehicle-card__placeholder" aria-hidden="true">
-                                        No image available
-                                    </span>
+                                    <img class="vehicle-card__img"
+                                         src="assets/images/vehicles/vehicle-placeholder.svg"
+                                         alt="<?php echo e('No photograph available for ' . $v['year'] . ' ' . $v['make'] . ' ' . $v['model']); ?>"
+                                         width="640" height="360"
+                                         loading="lazy">
                                 <?php endif; ?>
 
                                 <div class="vehicle-card__body">

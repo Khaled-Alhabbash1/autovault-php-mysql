@@ -4,8 +4,7 @@
  * AutoVault - Reusable page footer
  * -------------------------------------------------------------------------
  * Every page includes this file at the very bottom. It closes the <main>
- * content area, shows the footer, loads the JavaScript, and closes the
- * HTML document.
+ * content area, shows the footer, and closes the HTML document.
  * -------------------------------------------------------------------------
  */
 
@@ -26,6 +25,8 @@ $currentYear = date('Y');
                     <li><a href="index.php">Home</a></li>
                     <li><a href="about.php">About</a></li>
                     <li><a href="catalogue.php">Catalogue</a></li>
+                    <li><a href="media.php">Media</a></li>
+                    <li><a href="help.php">Help</a></li>
                 </ul>
             </nav>
             <p class="copyright">
@@ -35,7 +36,5 @@ $currentYear = date('Y');
         </div>
     </footer>
 
-    <!-- External JavaScript (no JS frameworks are used) -->
-    <script src="assets/js/app.js"></script>
 </body>
 </html>

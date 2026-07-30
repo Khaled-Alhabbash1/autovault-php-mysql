@@ -38,11 +38,18 @@ require __DIR__ . '/includes/header.php';
             <li>Create an account and log in.</li>
             <li>Save vehicles to a favourites list.</li>
             <li>Request a test drive for a vehicle.</li>
+            <li>Watch the supplied vehicle media gallery.</li>
         </ul>
 
-        <p class="note">
-            This project is being built in small milestones, so some features
-            become available as development continues.
+        <h2>Business case</h2>
+        <p>
+            AutoVault gives a small vehicle retailer one maintainable place to
+            publish current inventory, help customers compare specifications,
+            build purchase interest through favourites and media, and collect
+            structured test-drive requests. This reduces reliance on scattered
+            listings and manual enquiries while giving administrators controlled
+            tools for updating stock, managing account access, reviewing requests,
+            and checking basic application health.
         </p>
     </section>
 

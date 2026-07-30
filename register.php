@@ -134,15 +134,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 // ---- Display the page ----
 $pageTitle       = 'Register';
 $metaDescription = 'Create a new AutoVault account.';
+$metaKeywords = 'AutoVault registration, create vehicle account';
 require __DIR__ . '/includes/header.php';
 ?>
 
     <section class="auth-page">
         <h1>Create your account</h1>
+        <p class="context-help"><a href="help-account.php">Registration help</a></p>
 
         <?php if (!empty($errors)): ?>
             <!-- Show any validation errors. Each message is escaped. -->
-            <div class="form-errors" role="alert">
+            <div class="form-errors" id="registration-errors" role="alert">
                 <ul>
                     <?php foreach ($errors as $error): ?>
                         <li><?php echo e($error); ?></li>
@@ -151,7 +153,8 @@ require __DIR__ . '/includes/header.php';
             </div>
         <?php endif; ?>
 
-        <form class="auth-form" action="register.php" method="post" novalidate>
+        <form class="auth-form" action="register.php" method="post" novalidate
+              <?php echo $errors ? 'aria-describedby="registration-errors"' : ''; ?>>
 
             <!-- Hidden CSRF token protects this form -->
             <?php echo csrf_field(); ?>
@@ -160,33 +163,33 @@ require __DIR__ . '/includes/header.php';
                 <label for="first_name">First name</label>
                 <input type="text" id="first_name" name="first_name"
                        value="<?php echo e($old['first_name']); ?>"
-                       maxlength="50" required>
+                       maxlength="50" autocomplete="given-name" required>
             </div>
 
             <div class="form-group">
                 <label for="last_name">Last name</label>
                 <input type="text" id="last_name" name="last_name"
                        value="<?php echo e($old['last_name']); ?>"
-                       maxlength="50" required>
+                       maxlength="50" autocomplete="family-name" required>
             </div>
 
             <div class="form-group">
                 <label for="email">Email address</label>
                 <input type="email" id="email" name="email"
                        value="<?php echo e($old['email']); ?>"
-                       maxlength="150" required>
+                       maxlength="150" autocomplete="email" required>
             </div>
 
             <div class="form-group">
                 <label for="password">Password (at least 8 characters)</label>
                 <input type="password" id="password" name="password"
-                       minlength="8" required>
+                       minlength="8" autocomplete="new-password" required>
             </div>
 
             <div class="form-group">
                 <label for="password_confirm">Confirm password</label>
                 <input type="password" id="password_confirm" name="password_confirm"
-                       minlength="8" required>
+                       minlength="8" autocomplete="new-password" required>
             </div>
 
             <button type="submit" class="button">Create account</button>

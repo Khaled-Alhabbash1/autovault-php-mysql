@@ -42,6 +42,26 @@ function catalogue_fuel_types() {
 }
 
 /**
+ * Validate a vehicle ID from GET or POST.
+ *
+ * The vehicles.id column is an UNSIGNED INT, so valid IDs are positive
+ * base-10 integers no larger than 4,294,967,295. Returning null gives every
+ * page one consistent way to reject missing, array, decimal and invalid IDs.
+ */
+function parse_vehicle_id($value) {
+    if (
+        !is_string($value)
+        || !preg_match('/^[1-9][0-9]*$/', $value)
+        || strlen($value) > 10
+        || (int) $value > 4294967295
+    ) {
+        return null;
+    }
+
+    return (int) $value;
+}
+
+/**
  * Turn the raw GET values into:
  *   - 'where'   : an array of SQL conditions using NAMED placeholders
  *   - 'params'  : the matching values for those placeholders
@@ -171,12 +191,9 @@ function format_mileage($mileage) {
  * Returns null when the path is missing or unsafe, so the caller can show a
  * placeholder instead.
  *
- * Rules:
- *   - empty -> null
- *   - ".." anywhere -> null (blocks directory traversal)
- *   - a URL scheme is only allowed if it is http or https
- *     (blocks things like javascript:, data:, file:)
- *   - otherwise it is treated as a local path relative to the site root
+ * Only repository-owned images below assets/images/vehicles/ are allowed.
+ * This blocks directory traversal, external tracking URLs, protocol-relative
+ * URLs, JavaScript/data/file schemes, and unrelated local application files.
  */
 function catalogue_image_src($path) {
     $path = trim((string) ($path ?? ''));
@@ -185,19 +202,20 @@ function catalogue_image_src($path) {
         return null;
     }
 
-    // Block directory traversal and Windows-style backslashes.
-    if (strpos($path, '..') !== false || strpos($path, '\\') !== false) {
+    // Decode once as well so encoded traversal such as %2e%2e is rejected.
+    $decodedPath = rawurldecode($path);
+    if (
+        strpos($decodedPath, '..') !== false
+        || strpos($decodedPath, '\\') !== false
+        || strpos($decodedPath, '//') !== false
+    ) {
         return null;
     }
 
-    // If the path contains a scheme (like "http://"), only allow http/https.
-    if (preg_match('#^[a-z][a-z0-9+.\-]*:#i', $path)) {
-        if (!preg_match('#^https?://#i', $path)) {
-            return null;
-        }
-        return $path;
+    // Keep paths inside the one public vehicle-image directory.
+    if (!preg_match('#^assets/images/vehicles/[A-Za-z0-9][A-Za-z0-9._/-]*$#D', $path)) {
+        return null;
     }
 
-    // Local path: drop any leading slash so it stays inside the app folder.
-    return ltrim($path, '/');
+    return $path;
 }

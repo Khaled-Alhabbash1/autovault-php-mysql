@@ -87,3 +87,30 @@ function is_logged_in() {
 function current_user() {
     return is_logged_in() ? $_SESSION['user'] : null;
 }
+
+// Is the authenticated account an administrator?
+function is_admin() {
+    return is_logged_in()
+        && isset($_SESSION['user']['role'])
+        && $_SESSION['user']['role'] === 'admin';
+}
+
+/**
+ * Shared administrator gate.
+ *
+ * Logged-out visitors are redirected to login. Logged-in non-administrators
+ * receive a 403 response and the caller can render a friendly denial page.
+ */
+function require_admin($loginPath = 'login.php') {
+    if (!is_logged_in()) {
+        header('Location: ' . $loginPath);
+        exit;
+    }
+
+    if (!is_admin()) {
+        http_response_code(403);
+        return false;
+    }
+
+    return true;
+}

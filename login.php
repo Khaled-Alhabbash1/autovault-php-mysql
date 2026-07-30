@@ -90,11 +90,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 // ---- Display the page ----
 $pageTitle       = 'Login';
 $metaDescription = 'Log in to your AutoVault account.';
+$metaKeywords = 'AutoVault login, vehicle account';
 require __DIR__ . '/includes/header.php';
 ?>
 
     <section class="auth-page">
         <h1>Log in</h1>
+        <p class="context-help"><a href="help-account.php">Account and login help</a></p>
 
         <?php if ($flashSuccess !== ''): ?>
             <div class="form-success" role="status">
@@ -103,7 +105,7 @@ require __DIR__ . '/includes/header.php';
         <?php endif; ?>
 
         <?php if (!empty($errors)): ?>
-            <div class="form-errors" role="alert">
+            <div class="form-errors" id="login-errors" role="alert">
                 <ul>
                     <?php foreach ($errors as $error): ?>
                         <li><?php echo e($error); ?></li>
@@ -112,7 +114,8 @@ require __DIR__ . '/includes/header.php';
             </div>
         <?php endif; ?>
 
-        <form class="auth-form" action="login.php" method="post" novalidate>
+        <form class="auth-form" action="login.php" method="post" novalidate
+              <?php echo $errors ? 'aria-describedby="login-errors"' : ''; ?>>
 
             <?php echo csrf_field(); ?>
 
@@ -120,12 +123,13 @@ require __DIR__ . '/includes/header.php';
                 <label for="email">Email address</label>
                 <input type="email" id="email" name="email"
                        value="<?php echo e($old['email']); ?>"
-                       maxlength="150" required>
+                       maxlength="150" autocomplete="email" required>
             </div>
 
             <div class="form-group">
                 <label for="password">Password</label>
-                <input type="password" id="password" name="password" required>
+                <input type="password" id="password" name="password"
+                       autocomplete="current-password" required>
             </div>
 
             <button type="submit" class="button">Log in</button>

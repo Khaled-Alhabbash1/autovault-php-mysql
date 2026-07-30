@@ -1,139 +1,146 @@
-# AutoVault — Installation Guide
+# AutoVault installation on Windows with XAMPP
 
-This guide explains how to set up AutoVault on your own computer for
-development and testing. It is written for beginners.
+This guide sets up AutoVault locally without placing credentials in Git.
 
----
+## 1. Required software
 
-## 1. What you need
+- Windows 11
+- XAMPP with Apache and PHP 8 or newer
+- Oracle MySQL Server 8
+- A modern browser
+- Git, if cloning the repository
 
-Install **one** of the following all-in-one packages (they include PHP,
-MySQL/MariaDB and a web server), or install the parts separately.
+AutoVault targets Oracle MySQL 8. XAMPP may bundle MariaDB, but that is not the
+database used for final compatibility testing.
 
-- **Windows:** [XAMPP](https://www.apachefriends.org/) or WAMP
-- **macOS:** [MAMP](https://www.mamp.info/) or XAMPP
-- **Linux:** Apache/Nginx + PHP + MySQL from your package manager
+## 2. Clone or copy the repository
 
-Minimum versions:
+Place the project inside XAMPP's web root. A typical location is:
 
-- PHP **8.0** or newer (check with `php -v`)
-- Oracle **MySQL 8.0** (this project targets MySQL 8 specifically)
+```text
+C:\xampp\htdocs\autovault-php-mysql
+```
 
-> This project was set up against **Oracle MySQL Server 8.0** running on
-> `localhost:3306`. XAMPP's bundled MariaDB will also run the schema, but
-> MySQL 8 is the intended target.
+To clone:
 
-## 2. Get the project files
-
-Clone the repository (or copy the folder into your web root, e.g. XAMPP's
-`htdocs`):
-
-```bash
+```powershell
+cd C:\xampp\htdocs
 git clone https://github.com/Khaled-Alhabbash1/autovault-php-mysql.git
-cd autovault-php-mysql
 ```
 
-## 3. Create the database
+If the clone contains an additional nested project directory, use the
+directory that directly contains `index.php`, `admin`, `includes`, and
+`database` as the web root.
 
-The file [`database/schema.sql`](database/schema.sql) creates the `autovault`
-database and all tables. It contains **structure only — no data**.
+## 3. Start Apache and MySQL
 
-### Option A — command line
+1. Open the XAMPP Control Panel.
+2. Start Apache.
+3. Start the intended MySQL 8 service. If MySQL was installed separately,
+   start it through Windows Services and make sure its port matches the
+   configuration used below.
+4. Resolve port conflicts before continuing.
 
-```bash
-mysql -h 127.0.0.1 -P 3306 -u root -p < database/schema.sql
+## 4. Create and import the database
+
+The schema creates the `autovault` database automatically. From Command Prompt,
+while the project folder is the current directory:
+
+```bat
+mysql -h 127.0.0.1 -P 3306 -u root -p < database\schema.sql
 ```
 
-Enter your MySQL password when prompted. That's it.
+Alternatively, open phpMyAdmin, choose the Import tab, and import
+`database/schema.sql`. The file drops and recreates application tables, so
+re-importing it deletes existing AutoVault data.
 
-### Option B — phpMyAdmin (XAMPP / WAMP / MAMP)
+Import the sample catalogue second:
 
-1. Open phpMyAdmin (usually `http://localhost/phpmyadmin`).
-2. Click the **SQL** tab.
-3. Open `database/schema.sql`, copy all of its contents, paste it in, and
-   click **Go**.
-
-### Verify it worked
-
-List the tables (you should see **10**):
-
-```bash
-mysql -h 127.0.0.1 -P 3306 -u root -p -e "USE autovault; SHOW TABLES;"
+```bat
+mysql -h 127.0.0.1 -P 3306 -u root -p autovault < database\sample-data.sql
 ```
 
-```
-contact_messages
-favourites
-settings
-system_services
-test_drive_requests
-themes
-users
-vehicle_images
-vehicle_options
-vehicles
-```
+In phpMyAdmin, select the new `autovault` database and import
+`database/sample-data.sql`. It adds 20 fictional vehicles, 20 local image
+assignments, and 40 selectable options. It creates no accounts or personal data.
 
-Confirm every table uses **InnoDB** and **utf8mb4**:
+## 5. Create the local configuration
 
-```bash
-mysql -h 127.0.0.1 -P 3306 -u root -p -e "SELECT TABLE_NAME, ENGINE, TABLE_COLLATION FROM information_schema.TABLES WHERE TABLE_SCHEMA='autovault';"
+Copy the template:
+
+```powershell
+Copy-Item includes\config.example.php includes\config.php
 ```
 
-Every row should show `InnoDB` and a `utf8mb4_...` collation. Because there is
-no seed data, every table is empty at this stage (`SELECT COUNT(*)` returns 0).
+Open `includes/config.php` and set the local host, port, database name,
+database username, and database password. Do not edit the example template
+with real credentials. `includes/config.php` is ignored by Git.
 
-## 4. Configure database credentials
+## 6. Confirm the project location
 
-> Credentials are **never** committed to Git. A `config.example.php` template
-> and the database connection code are added in the next milestone. When they
-> exist, you will copy the template and fill in your own values:
->
-> ```bash
-> cp includes/config.example.php includes/config.php
-> ```
->
-> Then edit `includes/config.php` with your database host, name, username and
-> password. The real `config.php` is listed in `.gitignore`.
+Apache must serve the directory containing `index.php`. If the directory is
+`C:\xampp\htdocs\autovault-php-mysql`, open:
 
-## 5. Run the site
-
-Use whichever matches your setup:
-
-- **XAMPP / WAMP / MAMP:** place the project inside the web root (`htdocs`)
-  and open `http://localhost/autovault-php-mysql/`.
-- **PHP built-in server** (from the project folder):
-  ```bash
-  php -S localhost:8000
-  ```
-  then open `http://localhost:8000`.
-
-> Note: the public pages are empty placeholders until later milestones, so
-> there is nothing to view in the browser yet. This milestone sets up the
-> project structure and database only.
-
-## 6. Accounts and data
-
-This milestone creates the **database structure only**. There is **no seed
-data and no user accounts** yet. User registration, an administrator account
-and the sample vehicle catalogue are added in later milestones.
-
-## 7. Resetting the database
-
-`schema.sql` drops the tables before creating them, so you can safely re-run
-it to start fresh. **This deletes all data.**
-
-```bash
-mysql -h 127.0.0.1 -P 3306 -u root -p < database/schema.sql
+```text
+http://localhost/autovault-php-mysql/
 ```
 
----
+Never open PHP files by double-clicking them or through a `file://` URL.
+
+## 7. Register a normal user
+
+1. Open `register.php` through the site navigation.
+2. Enter a name, valid email, and password of at least eight characters.
+3. Submit the form and log in.
+
+Registration always creates the fixed `user` role. A browser cannot request
+the administrator role.
+
+## 8. Create an administrator safely
+
+AutoVault intentionally has no public role-promotion form and the schema has
+no default account. First register the account normally. Then, using a trusted
+local MySQL administration tool, identify the intended account by its exact
+record and change only its `role` column from `user` to `admin`.
+
+Before changing it:
+
+- Confirm the account ID and email belong to the intended administrator.
+- Never change `password_hash` manually.
+- Never publish the SQL command, email, or password.
+- Keep at least one active administrator; the application prevents the final
+  active administrator from being deactivated.
+
+Log out and log in again after the role change so the session receives the
+new role.
+
+## 9. Verify the installation
+
+Check:
+
+- Home, About, Help, Media, and Catalogue load.
+- Registration and login work.
+- The Catalogue contains 20 sample vehicles with unique photographs.
+- Light, dark, and showroom themes persist after reload.
+- All three videos display controls and play only when requested.
+- A normal user receives HTTP 403 for administrator pages.
+- An administrator can open the dashboard and monitoring page.
+- Monitoring shows `Connected` without exposing configuration values.
 
 ## Troubleshooting
 
-| Problem | Fix |
+| Problem | Resolution |
 |---|---|
-| `Access denied for user` | Wrong MySQL username/password. Use the credentials you set when installing MySQL/XAMPP. |
-| `Unknown database 'autovault'` | The schema did not run. Re-run step 3. |
-| `php: command not found` | PHP is not on your PATH. Use `C:\xampp\php\php.exe`, or add PHP to your PATH. |
-| Foreign key / syntax errors | Make sure you are on MySQL 8 and running the **whole** file, not a fragment. |
+| Database connection failed | Confirm MySQL is running and that every local config value matches the server. |
+| Unknown database or missing table | Import the complete `database/schema.sql` file. |
+| Catalogue is empty | Import `database/sample-data.sql` after the schema. |
+| Access denied for database user | Correct the local username/password and confirm that user has access to `autovault`. |
+| Apache page not found | Confirm the project is under `htdocs` and use the folder containing `index.php`. |
+| PHP source appears as text | Access the project through Apache, not as a local file. |
+| Apache or MySQL will not start | Check XAMPP logs and resolve port conflicts. |
+| Session-expired message | Reload the form and submit the new page token. |
+| Administrator link is missing | Confirm the database role, then log out and back in to refresh the session. |
+| Images are missing | Store repository-owned images below `assets/images/vehicles/` and use safe relative paths. |
+| Video does not play | Confirm the MP4 exists in `assets/media/`, finished uploading, and is served with an MP4-compatible content type. |
+
+For broader checks, follow [docs/TESTING.md](docs/TESTING.md).
