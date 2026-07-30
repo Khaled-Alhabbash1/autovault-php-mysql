@@ -259,27 +259,49 @@ h1, h2, h3 {
     color: var(--color-header-muted);
 }
 
-.theme-toggle {
+/* Theme selector: three labelled buttons shown as a pill-style group. */
+.theme-switch {
     display: inline-flex;
+    flex-wrap: wrap;
     align-items: center;
-    gap: 0.4rem;
-    min-height: 42px;
-    padding: 0.5rem 0.65rem;
-    border: 1px solid rgba(255, 255, 255, 0.45);
-    border-radius: 6px;
+    gap: 0.25rem;
+    padding: 0.25rem;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.theme-switch__label {
+    padding: 0 0.5rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--color-header-muted);
+}
+
+.theme-switch__option {
+    min-height: 40px;
+    padding: 0.35rem 0.75rem;
+    border: 1px solid transparent;
+    border-radius: 999px;
     background: transparent;
     color: var(--color-header-text);
-    cursor: pointer;
     font: inherit;
+    font-size: 0.85rem;
+    line-height: 1;
+    cursor: pointer;
 }
 
-.theme-toggle:hover,
-.theme-toggle:focus {
-    background: rgba(255, 255, 255, 0.12);
+.theme-switch__option:hover,
+.theme-switch__option:focus-visible {
+    background: rgba(255, 255, 255, 0.16);
 }
 
-.theme-toggle__icon {
-    font-size: 1.1rem;
+/* The currently selected theme is clearly highlighted. */
+.theme-switch__option.is-active {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    color: #fff;
+    font-weight: 700;
 }
 
 /* =========================================================================

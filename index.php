@@ -3,10 +3,40 @@
  * -------------------------------------------------------------------------
  * AutoVault - Home page
  * -------------------------------------------------------------------------
- * This is the landing page. It uses the reusable header and footer.
- * It does NOT connect to the database yet (no catalogue in this milestone).
+ * The landing page. It shows a short welcome and a small "Featured vehicles"
+ * strip so visitors immediately see real vehicle photos. It is PUBLIC - no
+ * login is required - and only reads data with prepared statements.
  * -------------------------------------------------------------------------
  */
+
+require_once __DIR__ . '/includes/db.php';                // gives us $pdo
+require_once __DIR__ . '/includes/vehicle-functions.php'; // image + format helpers
+
+// Fetch up to three available vehicles (featured first) with their primary
+// image. Static SQL, no user input, but still run as a prepared statement.
+$featured = [];
+try {
+    $featuredStmt = $pdo->prepare(
+        "SELECT v.id, v.make, v.model, v.year, v.price,
+                pi.image_path, pi.alt_text
+         FROM vehicles v
+         LEFT JOIN vehicle_images pi ON pi.id = (
+             SELECT id FROM vehicle_images
+             WHERE vehicle_id = v.id
+             ORDER BY is_primary DESC, sort_order ASC, id ASC
+             LIMIT 1
+         )
+         WHERE v.status = 'available'
+         ORDER BY v.is_featured DESC, v.created_at DESC, v.id DESC
+         LIMIT 3"
+    );
+    $featuredStmt->execute();
+    $featured = $featuredStmt->fetchAll();
+} catch (PDOException $e) {
+    // The home page still works without the strip; log the real reason only.
+    error_log('Home featured vehicles query failed: ' . $e->getMessage());
+    $featured = [];
+}
 
 // Set the page title and description, then load the shared header.
 $pageTitle       = 'Home';
@@ -26,7 +56,49 @@ require __DIR__ . '/includes/header.php';
         </p>
     </section>
 
-    <!-- Simple feature highlights (static content, no database needed) -->
+    <?php if (!empty($featured)): ?>
+        <!-- Featured vehicles: real photos linking through to each vehicle -->
+        <section class="features">
+            <h2>Featured vehicles</h2>
+            <ul class="vehicle-grid">
+                <?php foreach ($featured as $v): ?>
+                    <?php
+                        $vehicleId = (int) $v['id'];
+                        // Only use the real photo when the file truly exists.
+                        $imageSrc = catalogue_image_src($v['image_path'] ?? null);
+                        if ($imageSrc !== null && !vehicle_image_exists($imageSrc)) {
+                            $imageSrc = null;
+                        }
+                        $label = $v['year'] . ' ' . $v['make'] . ' ' . $v['model'];
+                        $altText = trim((string) ($v['alt_text'] ?? '')) !== ''
+                            ? $v['alt_text']
+                            : $label;
+                    ?>
+                    <li class="vehicle-card">
+                        <a class="vehicle-card__link" href="vehicle.php?id=<?php echo $vehicleId; ?>">
+                            <?php if ($imageSrc !== null): ?>
+                                <img class="vehicle-card__img"
+                                     src="<?php echo e($imageSrc); ?>"
+                                     alt="<?php echo e($altText); ?>"
+                                     width="640" height="360" loading="lazy">
+                            <?php else: ?>
+                                <img class="vehicle-card__img"
+                                     src="<?php echo e(vehicle_placeholder_src()); ?>"
+                                     alt="<?php echo e('No photograph available for ' . $label); ?>"
+                                     width="640" height="360" loading="lazy">
+                            <?php endif; ?>
+                            <div class="vehicle-card__body">
+                                <h3 class="vehicle-card__title"><?php echo e($label); ?></h3>
+                                <p class="vehicle-card__price"><?php echo e(format_price($v['price'])); ?></p>
+                            </div>
+                        </a>
+                    </li>
+                <?php endforeach; ?>
+            </ul>
+        </section>
+    <?php endif; ?>
+
+    <!-- Simple feature highlights (static content) -->
     <section class="features">
         <h2>Why AutoVault?</h2>
         <div class="feature-grid">

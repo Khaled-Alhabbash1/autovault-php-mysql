@@ -128,11 +128,18 @@ function navActive($file, $currentPage) {
                     <li><a class="nav-link<?php echo $helpIsActive ? ' active' : ''; ?>"
                            href="<?php echo e($helpHref); ?>">Help</a></li>
                     <li class="nav-theme">
-                        <button class="theme-toggle" id="themeToggle" type="button"
-                                aria-label="Switch colour theme">
-                            <span aria-hidden="true" class="theme-toggle__icon">◐</span>
-                            <span id="themeLabel">Use dark theme</span>
-                        </button>
+                        <!-- Three clearly labelled theme buttons. JavaScript marks
+                             the active one with aria-pressed and an "is-active"
+                             class. Real <button> elements keep it keyboard usable. -->
+                        <div class="theme-switch" role="group" aria-label="Colour theme">
+                            <span class="theme-switch__label" aria-hidden="true">Theme</span>
+                            <button type="button" class="theme-switch__option"
+                                    data-theme-value="light" aria-pressed="false">Light</button>
+                            <button type="button" class="theme-switch__option"
+                                    data-theme-value="dark" aria-pressed="false">Dark</button>
+                            <button type="button" class="theme-switch__option"
+                                    data-theme-value="showroom" aria-pressed="false">Showroom</button>
+                        </div>
                     </li>
 
                     <?php if (is_logged_in()): ?>

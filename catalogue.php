@@ -49,6 +49,7 @@ $total      = 0;
 $totalPages = 1;
 $makes      = [];
 $bodyTypes  = [];
+$years      = [];
 
 try {
     // --- Dropdown data: the distinct makes and body types in stock ---
@@ -68,6 +69,16 @@ try {
     );
     $bodyStmt->execute();
     $bodyTypes = $bodyStmt->fetchAll(PDO::FETCH_COLUMN);
+
+    // --- Dropdown data: the actual years available, newest first ---
+    $yearStmt = $pdo->prepare(
+        "SELECT DISTINCT year FROM vehicles
+         WHERE status = 'available'
+         ORDER BY year DESC"
+    );
+    $yearStmt->execute();
+    // Cast to plain integers so the <option> values are clean.
+    $years = array_map('intval', $yearStmt->fetchAll(PDO::FETCH_COLUMN));
 
     // --- COUNT query: how many vehicles match the current filters? ---
     // Uses the SAME $whereSql and $params as the main query below.
@@ -214,16 +225,28 @@ require __DIR__ . '/includes/header.php';
 
                 <div class="form-group">
                     <label for="min_year">Min year</label>
-                    <input type="number" id="min_year" name="min_year"
-                           value="<?php echo e($filters['min_year']); ?>"
-                           min="1900" max="2100" step="1">
+                    <select id="min_year" name="min_year">
+                        <option value="">Any minimum year</option>
+                        <?php foreach ($years as $yearOption): ?>
+                            <option value="<?php echo (int) $yearOption; ?>"
+                                <?php echo ($filters['min_year'] === (string) $yearOption) ? 'selected' : ''; ?>>
+                                <?php echo (int) $yearOption; ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
                 </div>
 
                 <div class="form-group">
                     <label for="max_year">Max year</label>
-                    <input type="number" id="max_year" name="max_year"
-                           value="<?php echo e($filters['max_year']); ?>"
-                           min="1900" max="2100" step="1">
+                    <select id="max_year" name="max_year">
+                        <option value="">Any maximum year</option>
+                        <?php foreach ($years as $yearOption): ?>
+                            <option value="<?php echo (int) $yearOption; ?>"
+                                <?php echo ($filters['max_year'] === (string) $yearOption) ? 'selected' : ''; ?>>
+                                <?php echo (int) $yearOption; ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
                 </div>
 
                 <div class="form-group">
@@ -280,7 +303,11 @@ require __DIR__ . '/includes/header.php';
                     <?php foreach ($vehicles as $v): ?>
                         <?php
                             $vehicleId = (int) $v['id'];
+                            // Use the real photo only when the file truly exists.
                             $imageSrc  = catalogue_image_src($v['image_path'] ?? null);
+                            if ($imageSrc !== null && !vehicle_image_exists($imageSrc)) {
+                                $imageSrc = null;
+                            }
                             // A sensible alt text: the stored one, or "Year Make Model".
                             $altText   = trim((string) ($v['alt_text'] ?? '')) !== ''
                                 ? $v['alt_text']

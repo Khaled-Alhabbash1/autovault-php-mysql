@@ -135,19 +135,36 @@ function build_catalogue_filters(array $get) {
         $params[':fuel_type'] = $fuel;
     }
 
-    // ---- Year range: whole numbers only ----
-    $minYear = trim((string) ($get['min_year'] ?? ''));
-    $filters['min_year'] = $minYear;
-    if (preg_match('/^\d{1,4}$/', $minYear)) {
-        $where[] = 'v.year >= :min_year';
-        $params[':min_year'] = (int) $minYear;
+    // ---- Year range ----
+    // Years must be exactly four digits and inside a sensible range. Anything
+    // else (arrays, decimals, negatives, "notayear") is ignored, not queried.
+    $maxAllowedYear = (int) date('Y') + 1; // allow next-model-year listings
+    // Read as strings only. A crafted array (?min_year[]=x) becomes '' safely.
+    $minYearInput = $get['min_year'] ?? '';
+    $maxYearInput = $get['max_year'] ?? '';
+    $minYearRaw = is_string($minYearInput) ? trim($minYearInput) : '';
+    $maxYearRaw = is_string($maxYearInput) ? trim($maxYearInput) : '';
+    $filters['min_year'] = $minYearRaw;
+    $filters['max_year'] = $maxYearRaw;
+
+    $minYear = year_in_range($minYearRaw, $maxAllowedYear);
+    $maxYear = year_in_range($maxYearRaw, $maxAllowedYear);
+
+    // If both are given but the wrong way round, swap them so the search still
+    // makes sense (safe normalisation) and show the corrected values.
+    if ($minYear !== null && $maxYear !== null && $minYear > $maxYear) {
+        [$minYear, $maxYear] = [$maxYear, $minYear];
+        $filters['min_year'] = (string) $minYear;
+        $filters['max_year'] = (string) $maxYear;
     }
 
-    $maxYear = trim((string) ($get['max_year'] ?? ''));
-    $filters['max_year'] = $maxYear;
-    if (preg_match('/^\d{1,4}$/', $maxYear)) {
+    if ($minYear !== null) {
+        $where[] = 'v.year >= :min_year';
+        $params[':min_year'] = $minYear;
+    }
+    if ($maxYear !== null) {
         $where[] = 'v.year <= :max_year';
-        $params[':max_year'] = (int) $maxYear;
+        $params[':max_year'] = $maxYear;
     }
 
     // ---- Price range: numbers, optionally with up to two decimals ----
@@ -218,4 +235,65 @@ function catalogue_image_src($path) {
     }
 
     return $path;
+}
+
+/**
+ * Return true only when a (already validated) image path points at a file that
+ * actually exists on disk. This lets pages show a placeholder ONLY when the
+ * real image is genuinely missing, and never when it is available.
+ *
+ * The site root is the folder that contains this "includes" directory, so the
+ * check works no matter which page (root or admin/) calls it.
+ */
+function vehicle_image_exists($safePath) {
+    if (!is_string($safePath) || $safePath === '') {
+        return false;
+    }
+    if (catalogue_image_src($safePath) === null) {
+        return false; // reject anything not proven safe
+    }
+
+    return is_file(dirname(__DIR__) . '/' . $safePath);
+}
+
+/**
+ * The web path of the local "no photo" placeholder image.
+ */
+function vehicle_placeholder_src() {
+    return 'assets/images/vehicles/vehicle-placeholder.svg';
+}
+
+/**
+ * Validate a single year value. Returns the integer year when it is exactly
+ * four digits and within 1886..$maxAllowedYear, otherwise null.
+ */
+function year_in_range($value, $maxAllowedYear) {
+    $value = trim((string) $value);
+    if (!preg_match('/^\d{4}$/', $value)) {
+        return null;
+    }
+    $year = (int) $value;
+    if ($year < 1886 || $year > $maxAllowedYear) {
+        return null;
+    }
+
+    return $year;
+}
+
+/**
+ * A newest-to-oldest list of years for the administrator create/edit form.
+ * Runs from next year down to 1950, and always includes $includeYear (the
+ * value being edited) even if it falls outside that range.
+ */
+function admin_year_choices($includeYear = null) {
+    $maxYear = (int) date('Y') + 1;
+    $years = range($maxYear, 1950);
+
+    $includeYear = (int) $includeYear;
+    if ($includeYear >= 1886 && !in_array($includeYear, $years, true)) {
+        $years[] = $includeYear;
+        rsort($years);
+    }
+
+    return $years;
 }

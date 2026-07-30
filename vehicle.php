@@ -55,10 +55,12 @@ if ($vehicleId === null) {
             );
             $imageStmt->execute([':vehicle_id' => $vehicleId]);
 
-            // Discard unsafe paths before anything reaches an <img> element.
+            // Discard unsafe paths, and paths whose file is missing, before
+            // anything reaches an <img> element. This way the gallery only
+            // ever shows photos that genuinely exist.
             foreach ($imageStmt->fetchAll() as $image) {
                 $safeSrc = catalogue_image_src($image['image_path'] ?? null);
-                if ($safeSrc !== null) {
+                if ($safeSrc !== null && vehicle_image_exists($safeSrc)) {
                     $image['safe_src'] = $safeSrc;
                     $images[] = $image;
                 }

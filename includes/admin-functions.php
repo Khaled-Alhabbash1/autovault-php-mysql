@@ -276,9 +276,15 @@ function render_admin_vehicle_form(array $values, array $errors, $action, $submi
             </div>
             <div class="form-group">
                 <label for="year">Year</label>
-                <input type="number" id="year" name="year" min="1886"
-                       max="<?php echo (int) date('Y') + 1; ?>" required
-                       value="<?php echo e($values['year']); ?>">
+                <select id="year" name="year" required>
+                    <option value="">Select a year</option>
+                    <?php foreach (admin_year_choices($values['year']) as $yearOption): ?>
+                        <option value="<?php echo (int) $yearOption; ?>"
+                            <?php echo ($values['year'] === (string) $yearOption) ? 'selected' : ''; ?>>
+                            <?php echo (int) $yearOption; ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
             </div>
             <div class="form-group">
                 <label for="price">Price</label>

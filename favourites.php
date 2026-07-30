@@ -169,7 +169,11 @@ require __DIR__ . '/includes/header.php';
                 <?php foreach ($vehicles as $vehicle): ?>
                     <?php
                         $vehicleId = (int) $vehicle['id'];
+                        // Show the real photo only when the file exists.
                         $imageSrc = catalogue_image_src($vehicle['image_path'] ?? null);
+                        if ($imageSrc !== null && !vehicle_image_exists($imageSrc)) {
+                            $imageSrc = null;
+                        }
                         $altText = trim((string) ($vehicle['alt_text'] ?? ''));
                         if ($altText === '') {
                             $altText = $vehicle['year'] . ' ' . $vehicle['make'] . ' ' . $vehicle['model'];

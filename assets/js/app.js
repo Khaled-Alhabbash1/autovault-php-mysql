@@ -33,41 +33,38 @@
     applyTheme(savedTheme() || systemTheme());
 
     document.addEventListener('DOMContentLoaded', function () {
-        var themeToggle = document.getElementById('themeToggle');
-        var themeLabel = document.getElementById('themeLabel');
+        // The three theme buttons in the header. Each carries the theme it
+        // selects in data-theme-value (a fixed, whitelisted name).
+        var themeButtons = document.querySelectorAll('.theme-switch__option');
 
-        function updateThemeControl() {
-            if (!themeToggle || !themeLabel) {
-                return;
-            }
-
-            var currentTheme = document.documentElement.getAttribute('data-theme');
-            var nextTheme = currentTheme === 'light'
-                ? 'dark'
-                : (currentTheme === 'dark' ? 'showroom' : 'light');
-            themeLabel.textContent = 'Use ' + nextTheme + ' theme';
-            themeToggle.setAttribute(
-                'aria-label',
-                'Current theme: ' + currentTheme + '. Switch to ' + nextTheme + ' theme'
-            );
+        // Mark the button for the current theme as pressed/active so the
+        // selected theme is visually obvious and announced to screen readers.
+        function syncThemeButtons() {
+            var current = document.documentElement.getAttribute('data-theme');
+            Array.prototype.forEach.call(themeButtons, function (button) {
+                var isActive = button.getAttribute('data-theme-value') === current;
+                button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+                button.classList.toggle('is-active', isActive);
+            });
         }
 
-        if (themeToggle) {
-            updateThemeControl();
-            themeToggle.addEventListener('click', function () {
-                var current = document.documentElement.getAttribute('data-theme');
-                var next = current === 'light'
-                    ? 'dark'
-                    : (current === 'dark' ? 'showroom' : 'light');
-                applyTheme(next);
-
-                try {
-                    window.localStorage.setItem(storageKey, next);
-                } catch (error) {
-                    // Storage may be unavailable; the current page still updates.
-                }
-
-                updateThemeControl();
+        if (themeButtons.length) {
+            syncThemeButtons();
+            Array.prototype.forEach.call(themeButtons, function (button) {
+                button.addEventListener('click', function () {
+                    var choice = button.getAttribute('data-theme-value');
+                    // Ignore anything not on the fixed whitelist.
+                    if (allowedThemes.indexOf(choice) === -1) {
+                        return;
+                    }
+                    applyTheme(choice);
+                    try {
+                        window.localStorage.setItem(storageKey, choice);
+                    } catch (error) {
+                        // Storage may be unavailable; the page still updates.
+                    }
+                    syncThemeButtons();
+                });
             });
         }
 
@@ -76,7 +73,7 @@
             colorPreference.addEventListener('change', function () {
                 if (savedTheme() === null) {
                     applyTheme(systemTheme());
-                    updateThemeControl();
+                    syncThemeButtons();
                 }
             });
         }
@@ -143,6 +140,23 @@
                 control.addEventListener('change', updateConfiguredPrice);
             });
             updateConfiguredPrice();
+        }
+
+        // Respect reduced-motion: if the visitor prefers reduced motion, do not
+        // autoplay the gallery videos. We turn autoplay off and pause any that
+        // the browser already started, but we leave the controls fully working.
+        var reduceMotion = window.matchMedia
+            ? window.matchMedia('(prefers-reduced-motion: reduce)')
+            : null;
+        if (reduceMotion && reduceMotion.matches) {
+            var autoVideos = document.querySelectorAll('video[autoplay]');
+            Array.prototype.forEach.call(autoVideos, function (video) {
+                video.autoplay = false;
+                video.removeAttribute('autoplay');
+                if (typeof video.pause === 'function') {
+                    video.pause();
+                }
+            });
         }
     });
 }());

@@ -34,8 +34,10 @@ require __DIR__ . '/includes/header.php';
         <header class="page-intro">
             <h1>Vehicle media</h1>
             <p>
-                Explore three student-supplied automotive videos. Playback begins only
-                when you use the controls.
+                Explore three student-supplied automotive videos. They start
+                automatically and muted where the browser allows it - use the
+                controls to pause, replay, seek or unmute at any time. Some
+                browsers or reduced-motion settings may still block autoplay.
             </p>
             <p><a href="help-media.php">Need help playing these videos?</a></p>
         </header>
@@ -52,7 +54,11 @@ require __DIR__ . '/includes/header.php';
                     <p><?php echo e($item['description']); ?></p>
 
                     <?php if (is_file($absolutePath)): ?>
-                        <video controls preload="metadata"
+                        <!-- Muted is required so browsers permit autoplay.
+                             playsinline stops mobile browsers forcing fullscreen.
+                             Controls remain so visitors keep full command. -->
+                        <video class="media-card__video" autoplay muted loop playsinline
+                               controls preload="metadata"
                                aria-labelledby="<?php echo e($titleId); ?>"
                                aria-label="<?php echo e($item['label']); ?>">
                             <source src="<?php echo e($relativePath); ?>" type="video/mp4">
