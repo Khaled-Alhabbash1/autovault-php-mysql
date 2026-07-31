@@ -1,9 +1,12 @@
 # AutoVault
 
 AutoVault is a responsive vehicle marketplace built with plain PHP and
-Oracle MySQL. Visitors can browse the catalogue, registered users can save
+MySQL/MariaDB. Visitors can browse the catalogue, registered users can save
 favourites and request test drives, and administrators can manage catalogue
 records, accounts, requests, and safe application health information.
+
+**Live site:** https://alhabba.myweb.cs.uwindsor.ca/autovault/autovault-php-mysql/
+(hosted on University of Windsor MyWeb; MariaDB 10.4).
 
 ## Main features
 

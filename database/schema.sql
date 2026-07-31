@@ -16,11 +16,22 @@
 -- =====================================================================
 
 -- Create the database and switch to it.
-CREATE DATABASE IF NOT EXISTS autovault
-    CHARACTER SET utf8mb4
-    COLLATE utf8mb4_unicode_ci;
-
-USE autovault;
+-- NOTE: These two statements are COMMENTED OUT for shared hosting (e.g.
+-- University of Windsor MyWeb / cPanel) where the database already exists and
+-- the account is not allowed to CREATE or USE another database. Import this
+-- file INTO your existing database (for example alhabba_autovault); the import
+-- tool such as phpMyAdmin already selects that database for you.
+--
+-- On a local machine where you DO have full privileges, you can create and
+-- select the database manually first, for example:
+--     CREATE DATABASE autovault CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+--     USE autovault;
+--
+-- CREATE DATABASE IF NOT EXISTS autovault
+--     CHARACTER SET utf8mb4
+--     COLLATE utf8mb4_unicode_ci;
+--
+-- USE autovault;
 
 -- Drop tables first so the script can be re-run cleanly during setup.
 -- Order matters because of foreign keys (drop children before parents).

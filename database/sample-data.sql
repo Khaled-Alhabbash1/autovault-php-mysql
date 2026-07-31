@@ -8,7 +8,10 @@
 -- supplied PDF photographs and should be reviewed before real-world use.
 -- =====================================================================
 
-USE autovault;
+-- USE autovault;
+-- NOTE: Commented out for shared hosting where the database already exists and
+-- the account cannot USE another database. Import this file into your existing,
+-- already-selected database (for example alhabba_autovault), AFTER schema.sql.
 
 START TRANSACTION;
 
