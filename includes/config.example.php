@@ -27,3 +27,13 @@ if (!defined('DB_HOST')) {
     define('DB_PASS', '');           // Database password - set the REAL one in config.php
     define('DB_CHARSET', 'utf8mb4'); // Character set (utf8mb4 supports emojis, etc.)
 }
+
+// -------------------------------------------------------------------------
+// PRODUCTION ONLY (live server such as myweb.cs.uwindsor.ca):
+// Hide PHP errors from visitors - they are still written to the server log.
+// In your REAL includes/config.php on the live server, remove the "// " from
+// the next two lines. Leave them commented on your local machine so you can
+// still see errors while developing.
+// -------------------------------------------------------------------------
+// error_reporting(E_ALL);
+// ini_set('display_errors', '0');

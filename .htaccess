@@ -1,0 +1,45 @@
+# =====================================================================
+#  AutoVault - basic hardening for Apache shared hosting
+# ---------------------------------------------------------------------
+#  This file protects source/config files that PHP still reads from disk
+#  but that should never be downloaded through the browser. It is written
+#  defensively so it does nothing (rather than erroring) on hosts that do
+#  not enable a given module or ignore .htaccess entirely.
+#
+#  The PHP built-in server ignores .htaccess, so local `php -S` testing is
+#  unaffected. On XAMPP/Apache and on myweb.cs.uwindsor.ca it applies.
+# =====================================================================
+
+# Serve media with the correct type so videos play instead of downloading.
+<IfModule mod_mime.c>
+    AddType video/mp4 .mp4
+    AddType image/svg+xml .svg
+</IfModule>
+
+# Block direct web access to sensitive files (SQL dumps, docs, logs, config).
+# PHP still loads config.php from disk with require(), so the site keeps working.
+<FilesMatch "(?i)(\.sql|\.md|\.log|config\.php|config\.example\.php)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+# Block web access to server-only folders. The application includes these
+# from the filesystem, never over HTTP, so this is safe.
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^(includes|database|docs|storage)(/|$) - [F,L]
+</IfModule>
+
+# --- OPTIONAL: force HTTPS ---
+# Only enable this if your host has a working HTTPS certificate; otherwise it
+# can make the site unreachable. Remove the leading "# " on the four lines.
+# <IfModule mod_rewrite.c>
+#     RewriteEngine On
+#     RewriteCond %{HTTPS} off
+#     RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+# </IfModule>
